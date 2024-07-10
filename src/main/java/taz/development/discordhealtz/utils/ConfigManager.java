@@ -8,35 +8,48 @@ import java.io.IOException;
 
 public class ConfigManager {
 
-    private final File file;
-    private final FileConfiguration config;
+    private final File playersFile;
+    private final FileConfiguration playersConfig;
+
+    private final File discordFile;
+    private final FileConfiguration discordConfig;
 
     public ConfigManager(File dataFolder) {
-        file = new File(dataFolder, "players.yml");
-        if (!file.exists()) {
+        playersFile = new File(dataFolder, "players.yml");
+        if (!playersFile.exists()) {
             try {
-                file.createNewFile();
+                playersFile.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        config = YamlConfiguration.loadConfiguration(file);
+        playersConfig = YamlConfiguration.loadConfiguration(playersFile);
+
+        discordFile = new File(dataFolder, "discord.yml");
+        if (!discordFile.exists()) {
+            try {
+                discordFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        discordConfig = YamlConfiguration.loadConfiguration(discordFile);
     }
 
     public void setPlayerData(String playerName, String playerUUID, String discordUUID, String code) {
-        config.set(playerName + ".MUUID", playerUUID);
-        config.set(playerName + ".DUUID", discordUUID);
-        config.set(playerName + ".Codigo", code);
-        saveConfig();
+        playersConfig.set(playerName + ".MUUID", playerUUID);
+        playersConfig.set(playerName + ".DUUID", discordUUID);
+        playersConfig.set(playerName + ".Codigo", code);
+        savePlayersConfig();
     }
 
     public String getPlayerCode(String playerName) {
-        return config.getString(playerName + ".Codigo");
+        return playersConfig.getString(playerName + ".Codigo");
     }
 
     public String getPlayerByCode(String code) {
-        for (String key : config.getKeys(false)) {
-            if (code.equals(config.getString(key + ".Codigo"))) {
+        for (String key : playersConfig.getKeys(false)) {
+            if (code.equals(playersConfig.getString(key + ".Codigo"))) {
                 return key;
             }
         }
@@ -44,22 +57,57 @@ public class ConfigManager {
     }
 
     public void updateDiscordUUID(String playerName, String discordUUID) {
-        config.set(playerName + ".DUUID", discordUUID);
-        config.set("DiscordUUIDs." + discordUUID, playerName);
-        saveConfig();
+        playersConfig.set(playerName + ".DUUID", discordUUID);
+        playersConfig.set("DiscordUUIDs." + discordUUID, playerName);
+        savePlayersConfig();
     }
 
     public boolean isDiscordLinked(String userId) {
-        boolean linked = config.contains("DiscordUUIDs." + userId);
+        boolean linked = playersConfig.contains("DiscordUUIDs." + userId);
         System.out.println("Verifying Discord linked for user ID: " + userId + ", Result: " + linked);
         return linked;
     }
 
-    private void saveConfig() {
+    private void savePlayersConfig() {
         try {
-            config.save(file);
+            playersConfig.save(playersFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void saveDiscordConfig() {
+        try {
+            discordConfig.save(discordFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getRoleVerified() {
+        return discordConfig.getString("role_verified");
+    }
+
+    public String getTicketChannel() {
+        return discordConfig.getString("ticket_channel");
+    }
+
+    public String getVinculadoID() {
+        return discordConfig.getString("vinculado_id");
+    }
+
+    public void setRoleVerified(String roleId) {
+        discordConfig.set("role_verified", roleId);
+        saveDiscordConfig();
+    }
+
+    public void setTicketChannel(String channelId) {
+        discordConfig.set("ticket_channel", channelId);
+        saveDiscordConfig();
+    }
+
+    public void setVinculadoID(String vinculadoId) {
+        discordConfig.set("vinculado_id", vinculadoId);
+        saveDiscordConfig();
     }
 }

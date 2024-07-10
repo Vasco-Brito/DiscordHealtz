@@ -4,16 +4,17 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import org.jetbrains.annotations.NotNull;
 import taz.development.discordhealtz.utils.ConfigManager;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ConfigChannels {
 
-    private String[] optionList = new String[]{"obter", "ticketChannel", "VinculadoID"};
+    private final String[] optionList = new String[]{"obter", "ticketChannel", "VinculadoID"};
 
     public void configChannels(CommandAutoCompleteInteractionEvent event, ConfigManager configManager) {
 
@@ -24,7 +25,7 @@ public class ConfigChannels {
         event.replyChoices(options).queue();
     }
 
-    public void obterConfigChannel(SlashCommandInteractionEvent event, ConfigManager configManager) {
+    public void obterConfigChannel(@NotNull SlashCommandInteractionEvent event, ConfigManager configManager) {
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle("Configurações");
         embed.setColor(Color.BLACK);
@@ -33,7 +34,9 @@ public class ConfigChannels {
         embed.setImage("https://example.com/your-image.png"); // Substitua pela URL da sua imagem
 
         // Adicionando o campo Role verificado
-        embed.addField("Role verificado:", "12341412312", true);
+        embed.addField("Role verificado:", configManager.getRoleVerified(), false);
+        embed.addField("Ticket Channel:", configManager.getTicketChannel(), false);
+        embed.addField("Vinculado ID:", configManager.getVinculadoID(), false);
 
         // Espaço para seções adicionais
         embed.addBlankField(false);
@@ -47,11 +50,10 @@ public class ConfigChannels {
     }
 
     public void ticketChannelConfigChannel(SlashCommandInteractionEvent event, ConfigManager configManager) {
-
+        // Lógica para ticketChannel
     }
 
     public void vinculadoIDConfigChannel(SlashCommandInteractionEvent event, ConfigManager configManager) {
-
+        // Lógica para vinculadoID
     }
-
 }
