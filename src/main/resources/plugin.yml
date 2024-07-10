@@ -1,0 +1,7 @@
+name: DiscordHealtz
+version: 1.0
+main: taz.development.discordhealtz.DiscordHealtz
+api-version: 1.16
+commands:
+  vincular:
+    description: Vincula sua conta do Minecraft.
