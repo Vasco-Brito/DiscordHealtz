@@ -2,9 +2,12 @@ package taz.development.discordhealtz.utils;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import taz.development.discordhealtz.discord.utils.DiscordIds;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 
 public class ConfigManager {
 
@@ -28,12 +31,28 @@ public class ConfigManager {
         discordFile = new File(dataFolder, "discord.yml");
         if (!discordFile.exists()) {
             try {
-                discordFile.createNewFile();
+                copyResourceToFile("discord.yml", discordFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         discordConfig = YamlConfiguration.loadConfiguration(discordFile);
+        loadIds();
+    }
+
+    private void copyResourceToFile(String resourcePath, File destination) throws IOException {
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
+            if (in == null) {
+                throw new IllegalArgumentException("Resource not found: " + resourcePath);
+            }
+            Files.copy(in, destination.toPath());
+        }
+    }
+
+    public void loadIds() {
+        DiscordIds.ROLE_VERIFIED.setId(discordConfig.getString("role_verified"));
+        DiscordIds.TICKET_CHANNEL.setId(discordConfig.getString("ticket_channel"));
+        DiscordIds.TICKET_CATEGORY.setId(discordConfig.getString("ticket_category"));
     }
 
     public void setPlayerData(String playerName, String playerUUID, String discordUUID, String code) {
@@ -92,22 +111,36 @@ public class ConfigManager {
         return discordConfig.getString("ticket_channel");
     }
 
-    public String getVinculadoID() {
-        return discordConfig.getString("vinculado_id");
+    public String getTicketCategory() {
+        return discordConfig.getString("ticket_category");
     }
 
     public void setRoleVerified(String roleId) {
         discordConfig.set("role_verified", roleId);
         saveDiscordConfig();
+        DiscordIds.ROLE_VERIFIED.setId(roleId);
     }
 
     public void setTicketChannel(String channelId) {
         discordConfig.set("ticket_channel", channelId);
         saveDiscordConfig();
+        DiscordIds.TICKET_CHANNEL.setId(channelId);
     }
 
-    public void setVinculadoID(String vinculadoId) {
-        discordConfig.set("vinculado_id", vinculadoId);
+    public void setTicketCategory(String categoryId) {
+        discordConfig.set("ticket_category", categoryId);
+        saveDiscordConfig();
+        DiscordIds.TICKET_CATEGORY.setId(categoryId);
+    }
+
+    public int getCounter(String category) {
+        return discordConfig.getInt("COUNTER_" + category.toUpperCase(), 0);
+    }
+
+    public void incrementCounter(String category) {
+        String key = "COUNTER_" + category.toUpperCase();
+        int current = discordConfig.getInt(key, 0);
+        discordConfig.set(key, current + 1);
         saveDiscordConfig();
     }
 }

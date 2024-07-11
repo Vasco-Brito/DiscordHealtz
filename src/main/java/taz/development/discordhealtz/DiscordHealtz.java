@@ -10,6 +10,8 @@ import taz.development.discordhealtz.discord.startUp;
 import taz.development.discordhealtz.minecraft.commands.Vincular;
 import taz.development.discordhealtz.utils.ConfigManager;
 
+import java.io.File;
+
 public final class DiscordHealtz extends JavaPlugin {
 
     private ConfigManager configManager;
@@ -40,7 +42,6 @@ public final class DiscordHealtz extends JavaPlugin {
         int onlinePlayers = getServer().getOnlinePlayers().size();
         int maxPlayers = getServer().getMaxPlayers();
 
-        // Atualize a atividade do bot
         if (jda != null) {
             jda.getPresence().setActivity(net.dv8tion.jda.api.entities.Activity.customStatus(
                     "Jogadores online: " + onlinePlayers + "/" + maxPlayers

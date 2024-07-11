@@ -1,5 +1,6 @@
 package taz.development.discordhealtz.discord.commands;
 
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -33,6 +34,7 @@ public class SlashCommandListener extends ListenerAdapter {
             case "ticket":
                 Tickets tickets = new Tickets();
                 tickets.tickets(event, configManager);
+                break;
             case "config":
                 ConfigChannels configChannels = new ConfigChannels();
                 switch (event.getOption("option").getAsString()) {
@@ -40,14 +42,17 @@ public class SlashCommandListener extends ListenerAdapter {
                         configChannels.obterConfigChannel(event, configManager);
                         break;
                     case "ticketChannel":
+                        configChannels.ticketChannelConfigChannel(event, configManager);
                         break;
                     case "VinculadoID":
+                        configChannels.vinculadoIDConfigChannel(event, configManager);
+                        break;
+                    case "CategoriaTicket":
+                        configChannels.ticketCategotyConfigChannel(event, configManager);
                         break;
                     default:
                         break;
                 }
-
-
             default:
                 break;
         }
@@ -64,26 +69,46 @@ public class SlashCommandListener extends ListenerAdapter {
     @Override
     public void onStringSelectInteraction(StringSelectInteractionEvent event) {
         if (event.getComponentId().equals("ticket:options")) {
-            String selectedOption = event.getValues().get(0); // Pega o primeiro valor selecionado
+            String selectedOption = event.getValues().get(0);
             System.out.println("Opção selecionada: " + selectedOption);
-            // Adicione a lógica para lidar com cada opção selecionada
+
+            String categoryKey;
+            String channelNamePrefix;
             switch (selectedOption) {
                 case "ticket:compras_site":
-                    // Lógica para "Compras no site"
+                    categoryKey = "compras";
+                    channelNamePrefix = "Compras";
                     break;
                 case "ticket:reportar_bug":
-                    // Lógica para "Reportar um bug"
+                    categoryKey = "bugs";
+                    channelNamePrefix = "Bugs";
                     break;
                 case "ticket:denunciar_jogador":
-                    // Lógica para "Denunciar um jogador"
+                    categoryKey = "report";
+                    channelNamePrefix = "Report";
                     break;
                 case "ticket:outros_motivos":
-                    // Lógica para "Outros motivos"
+                    categoryKey = "diversos";
+                    channelNamePrefix = "Diversos";
                     break;
                 default:
-                    break;
+                    event.reply("Opção inválida.").setEphemeral(true).queue();
+                    return;
             }
-            event.reply("Você selecionou: " + selectedOption).setEphemeral(true).queue(); // Responda à interação
+
+            Category category = event.getJDA().getCategoryById(configManager.getTicketCategory());
+            if (category == null) {
+                event.reply("Categoria de tickets não encontrada.").setEphemeral(true).queue();
+                return;
+            }
+
+            int counter = configManager.getCounter(categoryKey);
+            String channelName = String.format("%s-%03d", channelNamePrefix, counter + 1);
+
+            category.createTextChannel(channelName).queue(textChannel -> {
+                event.reply("Canal de ticket criado: " + textChannel.getAsMention()).setEphemeral(true).queue();
+                configManager.incrementCounter(categoryKey);
+            });
         }
     }
 }

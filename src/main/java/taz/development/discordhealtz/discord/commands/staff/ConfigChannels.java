@@ -14,10 +14,9 @@ import java.util.stream.Stream;
 
 public class ConfigChannels {
 
-    private final String[] optionList = new String[]{"obter", "ticketChannel", "VinculadoID"};
+    private final String[] optionList = new String[]{"obter", "ticketChannel", "VinculadoID", "CategoriaTicket"};
 
     public void configChannels(CommandAutoCompleteInteractionEvent event, ConfigManager configManager) {
-
         List<Command.Choice> options = Stream.of(optionList)
                 .filter(option -> option.startsWith(event.getFocusedOption().getValue()))
                 .map(option -> new Command.Choice(option, option))
@@ -30,30 +29,30 @@ public class ConfigChannels {
         embed.setTitle("Configurações");
         embed.setColor(Color.BLACK);
 
-        // Adicionando uma imagem no topo do embed
-        embed.setImage("https://example.com/your-image.png"); // Substitua pela URL da sua imagem
-
-        // Adicionando o campo Role verificado
         embed.addField("Role verificado:", configManager.getRoleVerified(), false);
         embed.addField("Ticket Channel:", configManager.getTicketChannel(), false);
-        embed.addField("Vinculado ID:", configManager.getVinculadoID(), false);
+        embed.addField("Categoria do Ticket:", configManager.getTicketCategory(), false);
 
-        // Espaço para seções adicionais
-        embed.addBlankField(false);
-        embed.addBlankField(false);
-        embed.addBlankField(false);
-
-        // Adicionando um rodapé
-        embed.setFooter("Healtz Craft || C Todos os direitos reservados 2024");
+        embed.setFooter("Healtz Craft | Minecraft Brasil © Todos os direitos reservados 2024.");
 
         event.replyEmbeds(embed.build()).queue();
     }
 
     public void ticketChannelConfigChannel(SlashCommandInteractionEvent event, ConfigManager configManager) {
-        // Lógica para ticketChannel
+        String channelId = event.getOption("discordid").getAsString();
+        configManager.setTicketChannel(channelId);
+        event.reply("Canal de tickets configurado com o ID: " + channelId).queue();
     }
 
     public void vinculadoIDConfigChannel(SlashCommandInteractionEvent event, ConfigManager configManager) {
-        // Lógica para vinculadoID
+        String roleId = event.getOption("discordid").getAsString();
+        configManager.setRoleVerified(roleId);
+        event.reply("Cargo para vinculação configurado com o ID: " + roleId).queue();
+    }
+
+    public void ticketCategotyConfigChannel(SlashCommandInteractionEvent event, ConfigManager configManager) {
+        String categoryId = event.getOption("discordid").getAsString();
+        configManager.setTicketCategory(categoryId);
+        event.reply("A categoria onde os tickets serão abertos foi vinculada com o ID: " + categoryId).queue();
     }
 }

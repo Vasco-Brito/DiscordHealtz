@@ -1,3 +1,8 @@
 role_verified: 12341412312
 ticket_channel: 9876543210
-vinculado_id: 1122334455
+ticket_category: 123456789
+
+COUNTER_COMPRAS: 0
+COUNTER_BUGS: 0
+COUNTER_REPORT: 0
+COUNTER_DIVERSOS: 0
