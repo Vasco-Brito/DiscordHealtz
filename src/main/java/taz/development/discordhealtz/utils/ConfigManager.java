@@ -53,6 +53,7 @@ public class ConfigManager {
         DiscordIds.ROLE_VERIFIED.setId(discordConfig.getString("role_verified"));
         DiscordIds.TICKET_CHANNEL.setId(discordConfig.getString("ticket_channel"));
         DiscordIds.TICKET_CATEGORY.setId(discordConfig.getString("ticket_category"));
+        DiscordIds.SUPPORT_ROLE.setId(discordConfig.getString("support_role"));
     }
 
     public void setPlayerData(String playerName, String playerUUID, String discordUUID, String code) {
@@ -115,6 +116,10 @@ public class ConfigManager {
         return discordConfig.getString("ticket_category");
     }
 
+    public String getSupportRole() {
+        return discordConfig.getString("support_role");
+    }
+
     public void setRoleVerified(String roleId) {
         discordConfig.set("role_verified", roleId);
         saveDiscordConfig();
@@ -131,6 +136,12 @@ public class ConfigManager {
         discordConfig.set("ticket_category", categoryId);
         saveDiscordConfig();
         DiscordIds.TICKET_CATEGORY.setId(categoryId);
+    }
+
+    public void setSupportRole(String roleId) {
+        discordConfig.set("support_role", roleId);
+        saveDiscordConfig();
+        DiscordIds.SUPPORT_ROLE.setId(roleId);
     }
 
     public int getCounter(String category) {

@@ -1,6 +1,7 @@
 role_verified: 12341412312
 ticket_channel: 9876543210
 ticket_category: 123456789
+support_role: 123456789
 
 COUNTER_COMPRAS: 0
 COUNTER_BUGS: 0

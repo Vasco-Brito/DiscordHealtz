@@ -14,11 +14,11 @@ import java.util.stream.Stream;
 
 public class ConfigChannels {
 
-    private final String[] optionList = new String[]{"obter", "ticketChannel", "VinculadoID", "CategoriaTicket"};
+    private final String[] optionList = new String[]{"obter", "ticketChannel", "vinculadoID", "categoriaTicket", "supportRole"};
 
     public void configChannels(CommandAutoCompleteInteractionEvent event, ConfigManager configManager) {
         List<Command.Choice> options = Stream.of(optionList)
-                .filter(option -> option.startsWith(event.getFocusedOption().getValue()))
+                .filter(option -> option.toLowerCase().startsWith(event.getFocusedOption().getValue().toLowerCase()))
                 .map(option -> new Command.Choice(option, option))
                 .collect(Collectors.toList());
         event.replyChoices(options).queue();
@@ -32,6 +32,7 @@ public class ConfigChannels {
         embed.addField("Role verificado:", configManager.getRoleVerified(), false);
         embed.addField("Ticket Channel:", configManager.getTicketChannel(), false);
         embed.addField("Categoria do Ticket:", configManager.getTicketCategory(), false);
+        embed.addField("Support role:", configManager.getSupportRole(), false);
 
         embed.setFooter("Healtz Craft | Minecraft Brasil © Todos os direitos reservados 2024.");
 
@@ -50,9 +51,15 @@ public class ConfigChannels {
         event.reply("Cargo para vinculação configurado com o ID: " + roleId).queue();
     }
 
-    public void ticketCategotyConfigChannel(SlashCommandInteractionEvent event, ConfigManager configManager) {
+    public void ticketCategoryConfigChannel(SlashCommandInteractionEvent event, ConfigManager configManager) {
         String categoryId = event.getOption("discordid").getAsString();
         configManager.setTicketCategory(categoryId);
         event.reply("A categoria onde os tickets serão abertos foi vinculada com o ID: " + categoryId).queue();
+    }
+
+    public void supportRoleConfigChannel(SlashCommandInteractionEvent event, ConfigManager configManager) {
+        String roleId = event.getOption("discordid").getAsString();
+        configManager.setSupportRole(roleId);
+        event.reply("O cargo de suporte foi atualizado com sucesso: " + roleId).queue();
     }
 }
