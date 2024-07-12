@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import taz.development.discordhealtz.DiscordHealtz;
 import taz.development.discordhealtz.discord.commands.SlashCommandListener;
 import taz.development.discordhealtz.discord.utils.DiscordIds;
@@ -25,15 +26,16 @@ public class startUp extends ListenerAdapter {
         }
 
         JDA jda = JDABuilder.createDefault(BOT_TOKEN)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT)
                 .addEventListeners(new SlashCommandListener(configManager))
                 .build();
         jda.awaitReady();
 
         GUILD = jda.getGuildById(DiscordIds.GUILD_ID.getId());
 
-        configManager.loadIds();
-
         registerCommands(jda);
+
+        // updatePresence(jda, discordHealtz); // Atualiza presença inicialmente
 
         return jda;
     }
@@ -47,23 +49,26 @@ public class startUp extends ListenerAdapter {
 
     public static void registerCommands(JDA jda) {
         jda.updateCommands().addCommands(
+                // Comandos de membros
                 Commands.slash("vincular", "Vincula com sua conta do Minecraft.")
                         .addOption(OptionType.STRING, "codigo", "Código de vínculo (fornecido no Minecraft)", true),
                 Commands.slash("skills", "Mostra as skills de um jogador")
-                        .addOption(OptionType.STRING, "jogador", "Nome do jogador no Minecraft", true)
+                        .addOption(OptionType.STRING, "jogador", "Nome do jogador no minecraft", true)
                         .addOption(OptionType.STRING, "skill", "Especifica o tipo da skill", false),
 
+                // Comandos de staff
                 Commands.slash("ticket", "Teste para os tickets")
                         .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MODERATE_MEMBERS)),
                 Commands.slash("config", "Altera algumas configurações")
                         .addOption(OptionType.STRING, "option", "opção", true, true)
-                        .addOption(OptionType.STRING, "discordid", "ID pretendido", false, false) // Mudança aqui: "discordid" em minúsculas
+                        .addOption(OptionType.STRING, "discordid", "ID pretendido", false, false)
         ).queue(
                 success -> System.out.println("Novos comandos registados com sucesso!"),
                 failure -> System.err.println("Falha ao registar novos comandos: " + failure.getMessage())
         );
         System.out.println(jda.retrieveCommands());
     }
+
 
     public static void updatePresence(JDA jda, DiscordHealtz discordHealtz) {
         Guild guild = jda.getGuildById(DiscordIds.GUILD_ID.getId()); // Obtém o Guild pelo ID correto
@@ -73,7 +78,9 @@ public class startUp extends ListenerAdapter {
             return;
         }
 
+        // Implemente a lógica para atribuir os cargos conforme a presença do jogador
         for (Member member : guild.getMembers()) {
+            // Verifica se o jogador está online no servidor Minecraft
             if (discordHealtz != null && discordHealtz.isPlayerOnline(member.getEffectiveName())) {
                 assignOnlineRole(guild, member);
             } else {

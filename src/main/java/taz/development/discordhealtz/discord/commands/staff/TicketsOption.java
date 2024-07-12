@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 
-public class Tickets {
+public class TicketsOption {
 
     //Mensagem no sv do servidor
     //                    "<:mundo:1260970661321506966> [SITE](https://loja.healtzcraft.com) - <:MineCoins:1260970768733569075> [WIKI](https://healtz-craft-servidor-de-minecra.gitbook.io/healtz-craft) - <:Livro:1260970396115533897> [DISCORD](https://discord.gg/cCVHB2Uwg8)");
@@ -46,7 +46,7 @@ public class Tickets {
             Files.copy(bannerStream, tempBannerFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 
             EmbedBuilder embed = new EmbedBuilder();
-            embed.setColor(Color.YELLOW);
+            embed.setColor(Color.CYAN);
             embed.setTitle("📢 Central de Atendimento");
             embed.setDescription("Olá, seja bem-vindo à Central de Atendimento da Healtz Craft.\n\n" +
                     "> Selecione uma categoria na lista abaixo para iniciar seu atendimento. Vale lembrar que o seu atendimento será fornecido através de um canal privado.\n\n" +
