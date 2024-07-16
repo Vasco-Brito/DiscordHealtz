@@ -1,11 +1,5 @@
 package taz.development.discordhealtz.discord.commands;
 
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.concrete.Category;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -19,8 +13,6 @@ import taz.development.discordhealtz.discord.commands.staff.TicketsOption;
 import taz.development.discordhealtz.discord.utils.TicketGenerator;
 import taz.development.discordhealtz.discord.utils.ticket.CloseTicket;
 import taz.development.discordhealtz.utils.ConfigManager;
-
-import java.awt.Color;
 
 public class SlashCommandListener extends ListenerAdapter {
 
@@ -118,15 +110,30 @@ public class SlashCommandListener extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
-        if (event.getComponentId().equals("close_ticket")) {
-            CloseTicket close = new CloseTicket();
-            close.Close(event);
-        } else if (event.getComponentId().equals("confirm_close_ticket")) {
-            event.deferEdit().queue();
-            event.getChannel().delete().queue();
-        } else if (event.getComponentId().equals("cancel_close_ticket")) {
-            event.deferEdit().queue(); // Acknowledge the interaction first
-            event.getHook().deleteOriginal().queue(); // Delete the confirmation message
+        CloseTicket close = new CloseTicket(configManager);
+
+        switch (event.getComponentId()) {
+            case "close_ticket":
+                close.Close(event);
+                break;
+            case "confirm_close_ticket":
+                event.deferEdit().queue();
+                event.getHook().deleteOriginal().queue();
+                close.ConfirmClose(event);
+                break;
+            case "cancel_close_ticket":
+                event.deferEdit().queue();
+                event.getHook().deleteOriginal().queue();
+                break;
+            case "reopen_ticket":
+                close.ReopenTicket(event);
+                break;
+            case "delete_ticket":
+                close.DeleteTicket(event);
+                break;
+            default:
+                event.reply("Ação inválida.").setEphemeral(true).queue();
+                break;
         }
     }
 }
